@@ -1,0 +1,28 @@
+{
+    "name": "ciphertoken-perf-server",
+    "version": "0.0.1",
+    "description": "ciphertoken-perf-server",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Dahrein/ciphertoken-perf-server.git"
+    },
+    "keywords": [
+        "ciphertoken"
+    ],
+    "dependencies": {
+        "restify": "^2.8.3"
+    },
+    "author": "Kristina Zabunova",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Dahrein/ciphertoken-perf-server/issues"
+    },
+    "homepage": "https://github.com/Dahrein/ciphertoken-perf-server",
+    "engines": {
+        "node": "0.10.26"
+    }
+}
