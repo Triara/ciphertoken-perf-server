@@ -13,6 +13,13 @@ server.get("/", function (req, res, next) {
     return next();
 });
 
+server.get("/tokenCreations", function (req, res, next) {
+    var body = tester.getCipherTokenCreationTestResults();
+
+    res.send(200, body);
+    return next();
+});
+
 server.listen(process.env.PORT || 3000, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
