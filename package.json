@@ -17,7 +17,8 @@
         "restify": "^2.8.3",
         "ciphertoken": "git://github.com/thegameofcode/ciphertoken",
         "cron": "1.0.5",
-        "time": "0.11.0"
+        "time": "0.11.0",
+        "underscore": "^1.7.0"
     },
     "author": "Kristina Zabunova",
     "license": "MIT",

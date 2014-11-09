@@ -7,14 +7,21 @@ var server = restify.createServer({
 });
 
 server.get("/", function (req, res, next) {
-    var body = tester.getTokenCreationTestResults();
+    var body = tester.getResultsFromAllPerfTests();
 
     res.send(200, body);
     return next();
 });
 
-server.get("/tokenCreations", function (req, res, next) {
+server.get("/cipherTokenCreations", function (req, res, next) {
     var body = tester.getCipherTokenCreationTestResults();
+
+    res.send(200, body);
+    return next();
+});
+
+server.get("/AccessTokenCreations", function (req, res, next) {
+    var body = tester.getAccessTokenCreationTestResults();
 
     res.send(200, body);
     return next();

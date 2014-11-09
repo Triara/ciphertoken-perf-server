@@ -1,33 +1,39 @@
 var CronJob = require('cron').CronJob;
+var underscore = require('underscore');
 var tests = require('./performanceTests');
 
 const TIMES = 10000;
+const TIME_ZONE = "America/Los_Angeles";
+
 
 exports.getCipherTokenCreationTestResults = function(){
     return previousCipherTokenCreationResults;
 };
 
 exports.getAccessTokenCreationTestResults = function(){
-    return
-}
+    return previousAccessTokenCreationResults;
+};
+
+exports.getResultsFromAllPerfTests = function(){
+    return underscore.extend(previousCipherTokenCreationResults, previousAccessTokenCreationResults);
+};
 
 // CipherToken Creation Performance Test Schedule
 var previousCipherTokenCreationResults = {};
 var actualCipherTokenCreationResultTime = '';
 var totalTimeForCipherTokenCreationTestSets = 0;
 var timesCipherTokenCreationPerfTestWasRun = 0;
-
 var scheduleCipherTokenCreationTests = new CronJob({
-    cronTime: '0 * * * * *', // every minute
+    cronTime: '* * * * * *', // every minute
     onTick: function() {
         actualCipherTokenCreationResultTime = tests.runTokenCreationPerfTests(TIMES);
 
         var meanTime = calculateMeanTimeForCipherTokenCreation();
-        previousCipherTokenCreationResults[TIMES + ' token creations'] = actualCipherTokenCreationResultTime;
-        previousCipherTokenCreationResults['Mean time (ms) for ' + TIMES + ' token creations until now'] = meanTime;
+        previousCipherTokenCreationResults[TIMES + ' cipherToken creations created in'] = actualCipherTokenCreationResultTime + '(ms)';
+        previousCipherTokenCreationResults['Mean time for ' + TIMES + ' token creations until now'] = meanTime + '(ms)';
     },
     start: true,
-    timeZone: "America/Los_Angeles"
+    timeZone: TIME_ZONE
 });
 
 function calculateMeanTimeForCipherTokenCreation() {
@@ -45,17 +51,16 @@ var totalTimeForAccessTokenCreationTestSets = 0;
 var timesAccessTokenCreationPerfTestWasRun = 0;
 
 var scheduleAccessTokenCreationTests = new CronJob({
-    cronTime: '0 * * * * *', // every minute
+    cronTime: '* * * * * *', // every minute
     onTick: function() {
         actualAccessTokenCreationResultTime = tests.runTokenCreationPerfTests(TIMES);
 
         var meanTime = calculateMeanTimeForAccessTokenCreation();
-        previousAccessTokenCreationResults[TIMES + ' token creations'] = actualAccessTokenCreationResultTime;
-        previousAccessTokenCreationResults['Mean time (ms) for ' + TIMES + ' access token creations until now'] = meanTime;
-        console.log(previousAccessTokenCreationResults);
+        previousAccessTokenCreationResults[TIMES + ' accessToken creations created in'] = actualAccessTokenCreationResultTime + '(ms)';
+        previousAccessTokenCreationResults['Mean time for ' + TIMES + ' access token creations until now'] = meanTime + '(ms)';
     },
     start: true,
-    timeZone: "America/Los_Angeles"
+    timeZone: TIME_ZONE
 });
 
 function calculateMeanTimeForAccessTokenCreation() {
