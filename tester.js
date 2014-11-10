@@ -1,8 +1,22 @@
-var CronJob = require('cron').CronJob;
-var tests = require('./performanceTests');
+var tests = require('./performanceTests'),
+    async = require('async');
 
-const TIMES = 1000;
-const TIME_ZONE = "America/Los_Angeles";
+var times = 100;
+
+var previousCipherTokenCreationResults = {},
+    actualCipherTokenCreationResultTime = '',
+    totalTimeForCipherTokenCreationTestSets = 0,
+    timesCipherTokenCreationPerfTestWasRun = 0;
+
+var previousAccessTokenCreationResults = {},
+    actualAccessTokenCreationResultTime = '',
+    totalTimeForAccessTokenCreationTestSets = 0,
+    timesAccessTokenCreationPerfTestWasRun = 0;
+
+var previousAccessTokenCheckFirmResults = {},
+    actualAccessTokenCheckFirmResultTime = '',
+    totalTimeForAccessTokenCheckFirmTestSets = 0,
+    timesAccessTokenCheckFirmPerfTestWasRun = 0;
 
 
 exports.getCipherTokenCreationTestResults = function(){
@@ -26,24 +40,37 @@ exports.getResultsFromAllPerfTests = function(){
     return combinedResults;
 };
 
-// CipherToken Creation Performance Test Schedule
-var previousCipherTokenCreationResults = {},
-    actualCipherTokenCreationResultTime = '',
-    totalTimeForCipherTokenCreationTestSets = 0,
-    timesCipherTokenCreationPerfTestWasRun = 0;
+function runAllPerfTestForAGivenTimesParam(callback){ async.series([
+            function (cbk) {
+                // CipherToken Creation Performance Test
+                actualCipherTokenCreationResultTime = tests.runTokenCreationPerfTests(times);
 
-var scheduleCipherTokenCreationTests = new CronJob({
-    cronTime: '* * * * * *', // every minute
-    onTick: function() {
-        actualCipherTokenCreationResultTime = tests.runTokenCreationPerfTests(TIMES);
+                var meanTime = calculateMeanTimeForCipherTokenCreation();
+                previousCipherTokenCreationResults[times + ' times'] = meanTime + '(ms) mean time';
 
-        var meanTime = calculateMeanTimeForCipherTokenCreation();
-        previousCipherTokenCreationResults[TIMES + ' times'] = meanTime + '(ms) mean time';
-    },
-    start: true,
-    timeZone: TIME_ZONE
-});
+                cbk(null, previousCipherTokenCreationResults);
+            },
+            function (cbk) {
+                // Access Tokens Creation Performance Test
+                actualAccessTokenCreationResultTime = tests.accessTokensCreation11kPerfTest(times);
 
+                var meanTime = calculateMeanTimeForAccessTokenCreation();
+                previousAccessTokenCreationResults[times + ' times'] = meanTime + '(ms) mean time';
+
+                cbk(null, previousAccessTokenCreationResults);
+            },
+            function (cbk) {
+                // Access Tokens Check Firm Performance Test
+                actualAccessTokenCheckFirmResultTime = tests.runTokenCheckFirmPerfTests(times);
+
+                var meanTime = calculateMeanTimeForAccessTokenCheckFirm();
+                previousAccessTokenCheckFirmResults[times + ' times'] = meanTime + '(ms) mean time';
+
+                cbk(null, previousAccessTokenCheckFirmResults);
+            }
+        ]
+    );
+};
 function calculateMeanTimeForCipherTokenCreation() {
     timesCipherTokenCreationPerfTestWasRun++;
     totalTimeForCipherTokenCreationTestSets += actualCipherTokenCreationResultTime;
@@ -52,24 +79,6 @@ function calculateMeanTimeForCipherTokenCreation() {
     meanTime = Number(meanTime).toFixed(2);
     return meanTime;
 }
-
-// Access Tokens Creation Performance Test Schedule
-var previousAccessTokenCreationResults = {},
-    actualAccessTokenCreationResultTime = '',
-    totalTimeForAccessTokenCreationTestSets = 0,
-    timesAccessTokenCreationPerfTestWasRun = 0;
-
-var scheduleAccessTokenCreationTests = new CronJob({
-    cronTime: '* * * * * *', // every minute
-    onTick: function() {
-        actualAccessTokenCreationResultTime = tests.accessTokensCreation11kPerfTest(TIMES);
-
-        var meanTime = calculateMeanTimeForAccessTokenCreation();
-        previousAccessTokenCreationResults[TIMES + ' times'] = meanTime + '(ms) mean time';
-    },
-    start: true,
-    timeZone: TIME_ZONE
-});
 
 function calculateMeanTimeForAccessTokenCreation() {
     timesAccessTokenCreationPerfTestWasRun++;
@@ -80,24 +89,6 @@ function calculateMeanTimeForAccessTokenCreation() {
     return meanTime;
 }
 
-// Access Tokens Check Firm Performance Test Schedule
-var previousAccessTokenCheckFirmResults = {},
-    actualAccessTokenCheckFirmResultTime = '',
-    totalTimeForAccessTokenCheckFirmTestSets = 0,
-    timesAccessTokenCheckFirmPerfTestWasRun = 0;
-
-var scheduleAccessTokenCheckFirmTests = new CronJob({
-    cronTime: '* * * * * *', // every minute
-    onTick: function() {
-        actualAccessTokenCheckFirmResultTime = tests.runTokenCheckFirmPerfTests(TIMES);
-
-        var meanTime = calculateMeanTimeForAccessTokenCheckFirm();
-        previousAccessTokenCheckFirmResults[TIMES + ' times'] = meanTime + '(ms) mean time';
-    },
-    start: true,
-    timeZone: TIME_ZONE
-});
-
 function calculateMeanTimeForAccessTokenCheckFirm() {
     timesAccessTokenCheckFirmPerfTestWasRun++;
     totalTimeForAccessTokenCheckFirmTestSets += actualAccessTokenCheckFirmResultTime;
@@ -106,3 +97,30 @@ function calculateMeanTimeForAccessTokenCheckFirm() {
     meanTime = Number(meanTime).toFixed(2);
     return meanTime;
 }
+
+
+async.times(5, function(n, next){
+    console.log(n);
+    times = times*(n+1);
+
+    actualCipherTokenCreationResultTime = '';
+    totalTimeForCipherTokenCreationTestSets = 0;
+    timesCipherTokenCreationPerfTestWasRun = 0;
+
+    actualAccessTokenCreationResultTime = '';
+    totalTimeForAccessTokenCreationTestSets = 0;
+    timesAccessTokenCreationPerfTestWasRun = 0;
+
+    actualAccessTokenCheckFirmResultTime = '';
+    totalTimeForAccessTokenCheckFirmTestSets = 0;
+    timesAccessTokenCheckFirmPerfTestWasRun = 0;
+
+    async.times(3, function(m, next){
+            runAllPerfTestForAGivenTimesParam(next);
+        }
+        , function(err){
+            console.log(err);
+        });
+}, function(err){
+    console.log(err);
+});
