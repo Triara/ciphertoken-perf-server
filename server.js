@@ -20,8 +20,15 @@ server.get("/cipherTokenCreations", function (req, res, next) {
     return next();
 });
 
-server.get("/AccessTokenCreations", function (req, res, next) {
+server.get("/accessTokenCreations", function (req, res, next) {
     var body = tester.getAccessTokenCreationTestResults();
+
+    res.send(200, body);
+    return next();
+});
+
+server.get("/checkAccessTokenFirm", function(req, res, next) {
+    var body = tester.getAccessTokenCheckFirmTestResults();
 
     res.send(200, body);
     return next();
