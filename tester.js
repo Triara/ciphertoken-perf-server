@@ -91,8 +91,8 @@ function calculateMeanTimeForAccessTokenCheckFirm() {
 
 function runTests(startingTimes, iterations) {
     async.times(5, function (n, next) {
-        console.log(n);
         var times = startingTimes * (n + 1);
+        console.log('running tests for ' + times + '(n=' + n + ')');
 
         actualCipherTokenCreationResultTime = '';
         totalTimeForCipherTokenCreationTestSets = 0;
