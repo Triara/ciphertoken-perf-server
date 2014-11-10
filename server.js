@@ -6,29 +6,22 @@ var server = restify.createServer({
     version: '0.0.1'
 });
 
-server.get("/", function (req, res, next) {
+server.use(restify.bodyParser({ mapParams: false }));
+
+
+server.post("/start", function(req, res, next) {
+    var startingTimes = req.body.startingTimes || 300;
+    var iterations = req.body.iterations || 3;
+
+    tester.runTests(startingTimes, iterations);
     var body = tester.getResultsFromAllPerfTests();
 
     res.send(200, body);
     return next();
 });
 
-server.get("/cipherTokenCreations", function (req, res, next) {
-    var body = tester.getCipherTokenCreationTestResults();
-
-    res.send(200, body);
-    return next();
-});
-
-server.get("/accessTokenCreations", function (req, res, next) {
-    var body = tester.getAccessTokenCreationTestResults();
-
-    res.send(200, body);
-    return next();
-});
-
-server.get("/checkAccessTokenFirm", function(req, res, next) {
-    var body = tester.getAccessTokenCheckFirmTestResults();
+server.get("/outCome", function (req, res, next) {
+    var body = tester.getResultsFromAllPerfTests();
 
     res.send(200, body);
     return next();

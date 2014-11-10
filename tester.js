@@ -1,8 +1,6 @@
 var tests = require('./performanceTests'),
     async = require('async');
 
-var times = 100;
-
 var previousCipherTokenCreationResults = {},
     actualCipherTokenCreationResultTime = '',
     totalTimeForCipherTokenCreationTestSets = 0,
@@ -19,18 +17,6 @@ var previousAccessTokenCheckFirmResults = {},
     timesAccessTokenCheckFirmPerfTestWasRun = 0;
 
 
-exports.getCipherTokenCreationTestResults = function(){
-    return previousCipherTokenCreationResults;
-};
-
-exports.getAccessTokenCreationTestResults = function(){
-    return previousAccessTokenCreationResults;
-};
-
-exports.getAccessTokenCheckFirmTestResults = function(){
-    return previousAccessTokenCheckFirmResults;
-};
-
 exports.getResultsFromAllPerfTests = function(){
     var combinedResults = {};
     combinedResults['cipherTokenCreation'] = previousCipherTokenCreationResults;
@@ -40,7 +26,11 @@ exports.getResultsFromAllPerfTests = function(){
     return combinedResults;
 };
 
-function runAllPerfTestForAGivenTimesParam(callback){ async.series([
+exports.runTests = function(startingTimes, iterations){
+    runTests(startingTimes, iterations);
+};
+
+function runAllPerfTestForAGivenTimesParam(times){ async.series([
             function (cbk) {
                 // CipherToken Creation Performance Test
                 actualCipherTokenCreationResultTime = tests.runTokenCreationPerfTests(times);
@@ -99,28 +89,30 @@ function calculateMeanTimeForAccessTokenCheckFirm() {
 }
 
 
-async.times(5, function(n, next){
-    console.log(n);
-    times = times*(n+1);
+function runTests(startingTimes, iterations) {
+    async.times(5, function (n, next) {
+        console.log(n);
+        var times = startingTimes * (n + 1);
 
-    actualCipherTokenCreationResultTime = '';
-    totalTimeForCipherTokenCreationTestSets = 0;
-    timesCipherTokenCreationPerfTestWasRun = 0;
+        actualCipherTokenCreationResultTime = '';
+        totalTimeForCipherTokenCreationTestSets = 0;
+        timesCipherTokenCreationPerfTestWasRun = 0;
 
-    actualAccessTokenCreationResultTime = '';
-    totalTimeForAccessTokenCreationTestSets = 0;
-    timesAccessTokenCreationPerfTestWasRun = 0;
+        actualAccessTokenCreationResultTime = '';
+        totalTimeForAccessTokenCreationTestSets = 0;
+        timesAccessTokenCreationPerfTestWasRun = 0;
 
-    actualAccessTokenCheckFirmResultTime = '';
-    totalTimeForAccessTokenCheckFirmTestSets = 0;
-    timesAccessTokenCheckFirmPerfTestWasRun = 0;
+        actualAccessTokenCheckFirmResultTime = '';
+        totalTimeForAccessTokenCheckFirmTestSets = 0;
+        timesAccessTokenCheckFirmPerfTestWasRun = 0;
 
-    async.times(3, function(m, next){
-            runAllPerfTestForAGivenTimesParam(next);
-        }
-        , function(err){
-            console.log(err);
-        });
-}, function(err){
-    console.log(err);
-});
+        async.times(iterations, function (m, next) {
+                runAllPerfTestForAGivenTimesParam(times);
+            }
+            , function (err) {
+                console.log(err);
+            });
+    }, function (err) {
+        console.log(err);
+    });
+}
