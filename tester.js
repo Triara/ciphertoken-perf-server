@@ -1,5 +1,4 @@
 var CronJob = require('cron').CronJob;
-var underscore = require('underscore');
 var tests = require('./performanceTests');
 
 const TIMES = 1000;
@@ -20,11 +19,9 @@ exports.getAccessTokenCheckFirmTestResults = function(){
 
 exports.getResultsFromAllPerfTests = function(){
     var combinedResults = {};
-    combinedResults = underscore.extend(
-        previousCipherTokenCreationResults,
-        previousAccessTokenCreationResults,
-        previousAccessTokenCheckFirmResults
-    )
+    combinedResults['cipherTokenCreation'] = previousCipherTokenCreationResults;
+    combinedResults['accessTokenCreation'] = previousAccessTokenCreationResults;
+    combinedResults['accessTokenCheckFirm'] = previousAccessTokenCheckFirmResults;
 
     return combinedResults;
 };
@@ -41,8 +38,7 @@ var scheduleCipherTokenCreationTests = new CronJob({
         actualCipherTokenCreationResultTime = tests.runTokenCreationPerfTests(TIMES);
 
         var meanTime = calculateMeanTimeForCipherTokenCreation();
-        previousCipherTokenCreationResults[TIMES + ' cipherToken creations created in'] = actualCipherTokenCreationResultTime + '(ms)';
-        previousCipherTokenCreationResults['Mean time for ' + TIMES + ' token creations until now'] = meanTime + '(ms)';
+        previousCipherTokenCreationResults[TIMES + ' times'] = meanTime + '(ms) mean time';
     },
     start: true,
     timeZone: TIME_ZONE
@@ -51,6 +47,7 @@ var scheduleCipherTokenCreationTests = new CronJob({
 function calculateMeanTimeForCipherTokenCreation() {
     timesCipherTokenCreationPerfTestWasRun++;
     totalTimeForCipherTokenCreationTestSets += actualCipherTokenCreationResultTime;
+
     var meanTime = totalTimeForCipherTokenCreationTestSets / timesCipherTokenCreationPerfTestWasRun;
     meanTime = Number(meanTime).toFixed(2);
     return meanTime;
@@ -68,8 +65,7 @@ var scheduleAccessTokenCreationTests = new CronJob({
         actualAccessTokenCreationResultTime = tests.accessTokensCreation11kPerfTest(TIMES);
 
         var meanTime = calculateMeanTimeForAccessTokenCreation();
-        previousAccessTokenCreationResults[TIMES + ' accessTokens created in'] = actualAccessTokenCreationResultTime + '(ms)';
-        previousAccessTokenCreationResults['Mean time for ' + TIMES + ' access token creations until now'] = meanTime + '(ms)';
+        previousAccessTokenCreationResults[TIMES + ' times'] = meanTime + '(ms) mean time';
     },
     start: true,
     timeZone: TIME_ZONE
@@ -78,6 +74,7 @@ var scheduleAccessTokenCreationTests = new CronJob({
 function calculateMeanTimeForAccessTokenCreation() {
     timesAccessTokenCreationPerfTestWasRun++;
     totalTimeForAccessTokenCreationTestSets += actualAccessTokenCreationResultTime;
+
     var meanTime = totalTimeForAccessTokenCreationTestSets / timesAccessTokenCreationPerfTestWasRun;
     meanTime = Number(meanTime).toFixed(2);
     return meanTime;
@@ -95,8 +92,7 @@ var scheduleAccessTokenCheckFirmTests = new CronJob({
         actualAccessTokenCheckFirmResultTime = tests.runTokenCheckFirmPerfTests(TIMES);
 
         var meanTime = calculateMeanTimeForAccessTokenCheckFirm();
-        previousAccessTokenCheckFirmResults[TIMES + ' accessToken firms checked in'] = actualAccessTokenCheckFirmResultTime + '(ms)';
-        previousAccessTokenCheckFirmResults['Mean time for ' + TIMES + ' access token firms checked until now'] = meanTime + '(ms)';
+        previousAccessTokenCheckFirmResults[TIMES + ' times'] = meanTime + '(ms) mean time';
     },
     start: true,
     timeZone: TIME_ZONE
@@ -105,6 +101,7 @@ var scheduleAccessTokenCheckFirmTests = new CronJob({
 function calculateMeanTimeForAccessTokenCheckFirm() {
     timesAccessTokenCheckFirmPerfTestWasRun++;
     totalTimeForAccessTokenCheckFirmTestSets += actualAccessTokenCheckFirmResultTime;
+
     var meanTime = totalTimeForAccessTokenCheckFirmTestSets / timesAccessTokenCheckFirmPerfTestWasRun;
     meanTime = Number(meanTime).toFixed(2);
     return meanTime;
