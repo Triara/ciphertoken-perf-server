@@ -13,19 +13,12 @@ const DEFAULT_ITERATIONS = 3;
 server.use(restify.bodyParser({ mapParams: false }));
 
 server.post("/start", function(req, res, next) {
+    res.send(200, 'Performance tests in progress');
 
-    async.parallel([
-        function(){
-            var startingTimes = setStartingTimes(req);
-            var iterations = setIterations(req);
+    var startingTimes = setStartingTimes(req);
+    var iterations = setIterations(req);
 
-            tester.runTests(startingTimes, iterations);
-        },
-        function(){
-            res.send(200, 'Performance tests in progress');
-            return next();
-        }
-    ]);
+    tester.runTests(startingTimes, iterations);
 });
 
 server.get("/outCome", function (req, res, next) {
@@ -38,7 +31,6 @@ server.get("/outCome", function (req, res, next) {
 server.listen(process.env.PORT || 3000, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
-
 
 function setStartingTimes(req) {
     var startingTimes = '';
