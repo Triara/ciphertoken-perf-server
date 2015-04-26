@@ -1,11 +1,6 @@
 var tests = require('./performanceTests'),
     async = require('async');
 
-var previousCipherTokenCreationResults = {},
-    actualCipherTokenCreationResultTime = '',
-    totalTimeForCipherTokenCreationTestSets = 0,
-    timesCipherTokenCreationPerfTestWasRun = 0;
-
 var previousAccessTokenCreationResults = {},
     actualAccessTokenCreationResultTime = '',
     totalTimeForAccessTokenCreationTestSets = 0,
@@ -19,7 +14,6 @@ var previousDecodeTokenResults = {},
 
 exports.getResultsFromAllPerfTests = function(){
     var combinedResults = {};
-    combinedResults['cipherTokenCreation'] = previousCipherTokenCreationResults;
     combinedResults['accessTokenCreation'] = previousAccessTokenCreationResults;
     combinedResults['decodeToken'] = previousDecodeTokenResults;
 
@@ -31,15 +25,6 @@ exports.runTests = function(startingTimes, iterations){
 };
 
 function runAllPerfTestForAGivenTimesParam(times){ async.series([
-            function (cbk) {
-                // CipherToken Creation Performance Test
-                actualCipherTokenCreationResultTime = tests.runTokenCreationPerfTests(times);
-
-                var meanTime = calculateMeanTimeForCipherTokenCreation();
-                previousCipherTokenCreationResults[times + ' times'] = meanTime + '(ms) mean time';
-
-                cbk(null, previousCipherTokenCreationResults);
-            },
             function (cbk) {
                 // Access Tokens Creation Performance Test
                 actualAccessTokenCreationResultTime = tests.accessTokensCreation11kPerfTest(times);
@@ -60,14 +45,6 @@ function runAllPerfTestForAGivenTimesParam(times){ async.series([
             }
         ]
     );
-}
-function calculateMeanTimeForCipherTokenCreation() {
-    timesCipherTokenCreationPerfTestWasRun++;
-    totalTimeForCipherTokenCreationTestSets += actualCipherTokenCreationResultTime;
-
-    var meanTime = totalTimeForCipherTokenCreationTestSets / timesCipherTokenCreationPerfTestWasRun;
-    meanTime = Number(meanTime).toFixed(2);
-    return meanTime;
 }
 
 function calculateMeanTimeForAccessTokenCreation() {
@@ -90,13 +67,9 @@ function calculateMeanTimeForAccessTokenCheckFirm() {
 
 
 function runTests(startingTimes, iterations) {
-    async.times(5, function (n, next) {
+    async.times(5, function (n) {
         var times = startingTimes * (n + 1);
         console.log('running tests for ' + times + '(n=' + n + ')');
-
-        actualCipherTokenCreationResultTime = '';
-        totalTimeForCipherTokenCreationTestSets = 0;
-        timesCipherTokenCreationPerfTestWasRun = 0;
 
         actualAccessTokenCreationResultTime = '';
         totalTimeForAccessTokenCreationTestSets = 0;
@@ -106,7 +79,7 @@ function runTests(startingTimes, iterations) {
         totalTimeFordecodeTokenTestSets = 0;
         timesDecodeTokenPerfTestWasRun = 0;
 
-        async.times(iterations, function (m, next) {
+        async.times(iterations, function () {
                 runAllPerfTestForAGivenTimesParam(times);
             }
             , function (err) {

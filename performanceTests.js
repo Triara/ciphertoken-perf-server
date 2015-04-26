@@ -8,15 +8,6 @@ var settings = {
 	firmKey:  'myFirmKey123'
 };
 
-exports.runTokenCreationPerfTests = function(times){
-    var initialTime = new Date().getTime();
-
-    for(var i=0; i < times; i++){
-        ciphertoken.encode(settings, VALID_USER_ID, null, {}, function () {});
-    }
-    return new Date().getTime() - initialTime;
-};
-
 exports.accessTokensCreation11kPerfTest = function(times){
     var initialTime = new Date().getTime();
 
