@@ -11,17 +11,17 @@ var previousAccessTokenCreationResults = {},
     totalTimeForAccessTokenCreationTestSets = 0,
     timesAccessTokenCreationPerfTestWasRun = 0;
 
-var previousAccessTokenCheckFirmResults = {},
-    actualAccessTokenCheckFirmResultTime = '',
-    totalTimeForAccessTokenCheckFirmTestSets = 0,
-    timesAccessTokenCheckFirmPerfTestWasRun = 0;
+var previousDecodeTokenResults = {},
+    actualDecodeTokenResultTime = '',
+    totalTimeFordecodeTokenTestSets = 0,
+    timesDecodeTokenPerfTestWasRun = 0;
 
 
 exports.getResultsFromAllPerfTests = function(){
     var combinedResults = {};
     combinedResults['cipherTokenCreation'] = previousCipherTokenCreationResults;
     combinedResults['accessTokenCreation'] = previousAccessTokenCreationResults;
-    combinedResults['accessTokenCheckFirm'] = previousAccessTokenCheckFirmResults;
+    combinedResults['decodeToken'] = previousDecodeTokenResults;
 
     return combinedResults;
 };
@@ -50,13 +50,13 @@ function runAllPerfTestForAGivenTimesParam(times){ async.series([
                 cbk(null, previousAccessTokenCreationResults);
             },
             function (cbk) {
-                // Access Tokens Check Firm Performance Test
-                actualAccessTokenCheckFirmResultTime = tests.runTokenCheckFirmPerfTests(times);
+                // Decode Tokens Firm Performance Test
+                actualDecodeTokenResultTime = tests.runDecodeTokensPerfTests(times);
 
                 var meanTime = calculateMeanTimeForAccessTokenCheckFirm();
-                previousAccessTokenCheckFirmResults[times + ' times'] = meanTime + '(ms) mean time';
+                previousDecodeTokenResults[times + ' times'] = meanTime + '(ms) mean time';
 
-                cbk(null, previousAccessTokenCheckFirmResults);
+                cbk(null, previousDecodeTokenResults);
             }
         ]
     );
@@ -80,10 +80,10 @@ function calculateMeanTimeForAccessTokenCreation() {
 }
 
 function calculateMeanTimeForAccessTokenCheckFirm() {
-    timesAccessTokenCheckFirmPerfTestWasRun++;
-    totalTimeForAccessTokenCheckFirmTestSets += actualAccessTokenCheckFirmResultTime;
+    timesDecodeTokenPerfTestWasRun++;
+    totalTimeFordecodeTokenTestSets += actualDecodeTokenResultTime;
 
-    var meanTime = totalTimeForAccessTokenCheckFirmTestSets / timesAccessTokenCheckFirmPerfTestWasRun;
+    var meanTime = totalTimeFordecodeTokenTestSets / timesDecodeTokenPerfTestWasRun;
     meanTime = Number(meanTime).toFixed(2);
     return meanTime;
 }
@@ -102,9 +102,9 @@ function runTests(startingTimes, iterations) {
         totalTimeForAccessTokenCreationTestSets = 0;
         timesAccessTokenCreationPerfTestWasRun = 0;
 
-        actualAccessTokenCheckFirmResultTime = '';
-        totalTimeForAccessTokenCheckFirmTestSets = 0;
-        timesAccessTokenCheckFirmPerfTestWasRun = 0;
+        actualDecodeTokenResultTime = '';
+        totalTimeFordecodeTokenTestSets = 0;
+        timesDecodeTokenPerfTestWasRun = 0;
 
         async.times(iterations, function (m, next) {
                 runAllPerfTestForAGivenTimesParam(times);
