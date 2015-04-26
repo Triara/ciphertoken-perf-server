@@ -1,6 +1,5 @@
 var restify = require('restify'),
-    tester = require('./tester'),
-    async = require('async');
+    tester = require('./tester');
 
 var server = restify.createServer({
     name: 'CipherTokenPerformanceTestingServer',

@@ -60,7 +60,7 @@ function runAllPerfTestForAGivenTimesParam(times){ async.series([
             }
         ]
     );
-};
+}
 function calculateMeanTimeForCipherTokenCreation() {
     timesCipherTokenCreationPerfTestWasRun++;
     totalTimeForCipherTokenCreationTestSets += actualCipherTokenCreationResultTime;

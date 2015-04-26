@@ -15,7 +15,7 @@
     ],
     "dependencies": {
         "async": "^0.9.0",
-        "ciphertoken": "git://github.com/thegameofcode/ciphertoken",
+        "ciphertoken": "git+https://github.com/thegameofcode/ciphertoken.git#v0.0.4",
         "restify": "^2.8.3"
     },
     "author": "Kristina Zabunova",
